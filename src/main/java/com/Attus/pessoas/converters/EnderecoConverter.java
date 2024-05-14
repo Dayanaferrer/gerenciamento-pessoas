@@ -7,12 +7,8 @@ import com.Attus.pessoas.models.EnderecoModel;
 
 @Component
 public class EnderecoConverter {
- 
-    public EnderecoRecordDto toDto(EnderecoModel endereco) {
-        if (endereco == null) {
-            return null;
-        }
 
+    public EnderecoRecordDto entityToDto(EnderecoModel endereco) {
         return new EnderecoRecordDto(
             endereco.getId(),
             endereco.getLogradouro(),
@@ -24,11 +20,7 @@ public class EnderecoConverter {
         );
     }
 
-    public EnderecoModel toModel(EnderecoRecordDto dto) {
-        if (dto == null) {
-            return null;
-        }
-
+    public EnderecoModel dtoToEntity(EnderecoRecordDto dto) {
         EnderecoModel endereco = new EnderecoModel();
         endereco.setId(dto.id());
         endereco.setLogradouro(dto.logradouro());
@@ -37,7 +29,6 @@ public class EnderecoConverter {
         endereco.setCidade(dto.cidade());
         endereco.setEstado(dto.estado());
         endereco.setPrincipal(dto.isPrincipal());
-
         return endereco;
     }
 }
