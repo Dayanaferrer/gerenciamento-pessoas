@@ -36,8 +36,20 @@ public class PessoaService {
             .collect(Collectors.toList());
     }
     
+    public List<PessoaRecordDto> getPessoasByNomeCompleto(String nomeCompleto) {
+        return pessoaRepository.findByNomeCompletoContaining(nomeCompleto).stream()
+            .map(pessoaConverter::entityToDto)
+            .collect(Collectors.toList());
+    }
+    
     public Optional<PessoaModel> getPessoaById(Long id) {
         return pessoaRepository.findById(id);
+    }
+    
+    public List<PessoaRecordDto> getPessoasByIds(List<Long> ids) {
+        return pessoaRepository.findByIdIn(ids).stream()
+            .map(pessoaConverter::entityToDto)
+            .collect(Collectors.toList());
     }
 
     public PessoaModel updatePessoa(PessoaModel pessoaModel) {

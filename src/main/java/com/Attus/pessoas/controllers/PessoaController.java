@@ -1,5 +1,6 @@
 package com.Attus.pessoas.controllers;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Attus.pessoas.converters.PessoaConverter;
@@ -36,7 +38,7 @@ public class PessoaController {
     
     @Operation(summary = "Cria uma nova pessoa")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Pessoa criada com sucesso"),
+        @ApiResponse(responseCode = "200", description = "Pessoa criada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Solicitação inválida"),
         @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
@@ -92,6 +94,15 @@ public class PessoaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    
+    @Operation(summary = "Consultar pessoas pelo nome completo")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operação bem sucedida"),
+    })
+    @GetMapping("/nome/{nomeCompleto}")
+    public ResponseEntity<List<PessoaRecordDto>> getPessoasByNomeCompleto(@PathVariable String nomeCompleto) {
+        return ResponseEntity.ok(pessoaService.getPessoasByNomeCompleto(nomeCompleto));
+    }
 
     @Operation(summary = "Editar uma pessoa")
     @ApiResponses(value = {
@@ -116,4 +127,17 @@ public class PessoaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    
+    @Operation(summary = "Consulta uma ou mais pessoas pelos seus IDs")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200",  description  = "Operação bem sucedida"),
+        @ApiResponse(responseCode = "404",  description  = "Pessoas não encontradas")
+    })
+    @GetMapping("/ids")
+    public ResponseEntity<List<PessoaRecordDto>> getPessoasByIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(pessoaService.getPessoasByIds(ids));
+    }
+    
 }
+
+

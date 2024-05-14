@@ -11,10 +11,12 @@ import com.Attus.pessoas.models.PessoaModel;
 
 @Repository
 public interface PessoaRepository extends JpaRepository<PessoaModel, Long> {
-	List<PessoaModel> findByNomeCompleto(String nomeCompleto);
+	List<PessoaModel> findByNomeCompletoContaining(String nomeCompleto);
     Optional<PessoaModel> findById(Long id);
     
     @Query("SELECT p FROM PessoaModel p JOIN p.enderecos e WHERE e.principal = :principal")
     List<PessoaModel> findByEnderecoPrincipal(boolean principal);
+    
+    List<PessoaModel> findByIdIn(List<Long> ids);
 
 }
