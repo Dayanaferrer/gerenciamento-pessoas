@@ -30,11 +30,6 @@ public class PessoaController {
     @Autowired
     private EnderecoRepository enderecoRepository;
 
-    @PostMapping
-    public ResponseEntity<PessoaModel> createPessoa(@RequestBody PessoaRecordDto pessoaDto) {
-        PessoaModel pessoa = pessoaConverter.toModel(pessoaDto);
-        PessoaModel createdPessoa = pessoaService.createPessoa(pessoa);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPessoa);
-    }
+
 
 }
