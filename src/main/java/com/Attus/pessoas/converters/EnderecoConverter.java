@@ -1,8 +1,11 @@
 package com.Attus.pessoas.converters;
 
+import org.springframework.stereotype.Component;
+
 import com.Attus.pessoas.dtos.EnderecoRecordDto;
 import com.Attus.pessoas.models.EnderecoModel;
 
+@Component
 public class EnderecoConverter {
  
     public EnderecoRecordDto toDto(EnderecoModel endereco) {

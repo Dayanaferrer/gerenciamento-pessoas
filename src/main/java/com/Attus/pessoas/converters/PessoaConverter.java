@@ -3,10 +3,13 @@ package com.Attus.pessoas.converters;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import com.Attus.pessoas.dtos.EnderecoRecordDto;
 import com.Attus.pessoas.dtos.PessoaRecordDto;
 import com.Attus.pessoas.models.PessoaModel;
 
+@Component
 public class PessoaConverter {
 
 	   public PessoaRecordDto toDto(PessoaModel pessoa) {
