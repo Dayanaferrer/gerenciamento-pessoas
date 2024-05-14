@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Attus.pessoas.converters.PessoaConverter;
 import com.Attus.pessoas.dtos.PessoaRecordDto;
 import com.Attus.pessoas.models.PessoaModel;
-import com.Attus.pessoas.repositories.EnderecoRepository;
-import com.Attus.pessoas.repositories.PessoaRepository;
 import com.Attus.pessoas.services.PessoaService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/pessoas")
@@ -27,16 +29,17 @@ public class PessoaController {
 
 	@Autowired
     private PessoaService pessoaService;
-	
-    @Autowired
-    private PessoaRepository pessoaRepository;
-    
+
     @Autowired
     private PessoaConverter pessoaConverter;
     
-    @Autowired
-    private EnderecoRepository enderecoRepository;
     
+    @Operation(summary = "Cria uma nova pessoa")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Pessoa criada com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Solicitação inválida"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @PostMapping
     public ResponseEntity<PessoaRecordDto> createPessoa(@RequestBody PessoaRecordDto pessoaRecordDto) {
         try {
@@ -51,7 +54,12 @@ public class PessoaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    
+    @Operation(summary = "Consultar todas as pessoas")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operação bem sucedida"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @GetMapping
     public ResponseEntity<List<PessoaRecordDto>> buscarTodas() {
         try {
@@ -63,6 +71,12 @@ public class PessoaController {
         }
     }
 
+    @Operation(summary = "Consultar uma pessoa por ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operação bem sucedida"),
+        @ApiResponse(responseCode = "404", description = "Pessoa não encontrada"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<PessoaRecordDto> getPessoaById(@PathVariable Long id) {
         try {
@@ -79,6 +93,12 @@ public class PessoaController {
         }
     }
 
+    @Operation(summary = "Editar uma pessoa")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operação bem sucedida"),
+        @ApiResponse(responseCode = "404", description = "Pessoa não encontrada"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<PessoaRecordDto> updatePessoa(@PathVariable Long id, @RequestBody PessoaRecordDto pessoaDto) {
         try {
