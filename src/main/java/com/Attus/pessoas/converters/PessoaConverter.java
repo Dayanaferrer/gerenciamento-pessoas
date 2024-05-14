@@ -14,65 +14,69 @@ import com.Attus.pessoas.models.PessoaModel;
 @Component
 public class PessoaConverter {
 	
-	public PessoaRecordDto entityToDto(PessoaModel pessoa) {
-	    EnderecoModel enderecoPrincipal = pessoa.getEnderecos().stream()
-	        .filter(EnderecoModel::getPrincipal)
-	        .findFirst()
-	        .orElse(null);
-	    EnderecoRecordDto enderecoPrincipalDto = enderecoToDto(enderecoPrincipal);
+	  public PessoaRecordDto entityToDto(PessoaModel pessoa) {
+	        EnderecoModel enderecoPrincipal = pessoa.getEnderecos().stream()
+	            .filter(EnderecoModel::getPrincipal)
+	            .findFirst()
+	            .orElse(null);
 
-	    List<EnderecoRecordDto> enderecosSecundariosDto = pessoa.getEnderecos().stream()
-	        .filter(endereco -> !endereco.getPrincipal())
-	        .map(this::enderecoToDto)
-	        .collect(Collectors.toList());
+	        EnderecoRecordDto enderecoPrincipalDto = null;
+	        if (enderecoPrincipal != null) {
+	            enderecoPrincipalDto = enderecoToDto(enderecoPrincipal);
+	        }
 
-	    return new PessoaRecordDto(
-	        pessoa.getId(),
-	        pessoa.getNomeCompleto(),
-	        pessoa.getDataNascimento(),
-	        enderecoPrincipalDto,
-	        enderecosSecundariosDto
-	    );
+	        List<EnderecoRecordDto> enderecosSecundariosDto = pessoa.getEnderecos().stream()
+	            .filter(endereco -> !endereco.getPrincipal())
+	            .map(this::enderecoToDto)
+	            .collect(Collectors.toList());
+
+	        return new PessoaRecordDto(
+	            pessoa.getId(),
+	            pessoa.getNomeCompleto(),
+	            pessoa.getDataNascimento(),
+	            enderecoPrincipalDto,
+	            enderecosSecundariosDto
+	        );
+	    }
+
+	    public PessoaModel dtoToEntity(PessoaRecordDto dto) {
+	        PessoaModel pessoa = new PessoaModel();
+	        pessoa.setId(dto.id());
+	        pessoa.setNomeCompleto(dto.nomeCompleto());
+	        pessoa.setDataNascimento(dto.dataNascimento());
+
+	        EnderecoModel enderecoPrincipal = dtoToEndereco(dto.enderecoPrincipal());
+	        Set<EnderecoModel> enderecosSecundarios = dto.enderecosSecundarios().stream()
+	            .map(this::dtoToEndereco)
+	            .collect(Collectors.toSet());
+
+	        enderecosSecundarios.add(enderecoPrincipal);
+
+	        pessoa.setEnderecos(enderecosSecundarios);
+	        return pessoa;
+	    }
+
+	    private EnderecoRecordDto enderecoToDto(EnderecoModel endereco) {
+	        return new EnderecoRecordDto(
+	            endereco.getId(),
+	            endereco.getLogradouro(),
+	            endereco.getCep(),
+	            endereco.getNumero(),
+	            endereco.getCidade(),
+	            endereco.getEstado(),
+	            endereco.getPrincipal()
+	        );
+	    }
+
+	    private EnderecoModel dtoToEndereco(EnderecoRecordDto dto) {
+	        EnderecoModel endereco = new EnderecoModel();
+	        endereco.setId(dto.id());
+	        endereco.setLogradouro(dto.logradouro());
+	        endereco.setCep(dto.cep());
+	        endereco.setNumero(dto.numero());
+	        endereco.setCidade(dto.cidade());
+	        endereco.setEstado(dto.estado());
+	        endereco.setPrincipal(dto.isPrincipal());
+	        return endereco;
+	    }
 	}
-
-    public PessoaModel dtoToEntity(PessoaRecordDto dto) {
-        PessoaModel pessoa = new PessoaModel();
-        pessoa.setId(dto.idPessoa());
-        pessoa.setNomeCompleto(dto.nomeCompleto());
-        pessoa.setDataNascimento(dto.dataNascimento());
-
-        EnderecoModel enderecoPrincipal = dtoToEndereco(dto.enderecoPrincipal());
-        Set<EnderecoModel> enderecosSecundarios = dto.enderecosSecundarios().stream()
-            .map(this::dtoToEndereco)
-            .collect(Collectors.toSet());
-
-        enderecosSecundarios.add(enderecoPrincipal);
-
-        pessoa.setEnderecos(enderecosSecundarios);
-        return pessoa;
-    }
-
-    private EnderecoRecordDto enderecoToDto(EnderecoModel endereco) {
-        return new EnderecoRecordDto(
-            endereco.getId(),
-            endereco.getLogradouro(),
-            endereco.getCep(),
-            endereco.getNumero(),
-            endereco.getCidade(),
-            endereco.getEstado(),
-            endereco.getPrincipal()
-        );
-    }
-
-    private EnderecoModel dtoToEndereco(EnderecoRecordDto dto) {
-        EnderecoModel endereco = new EnderecoModel();
-        endereco.setId(dto.id());
-        endereco.setLogradouro(dto.logradouro());
-        endereco.setCep(dto.cep());
-        endereco.setNumero(dto.numero());
-        endereco.setCidade(dto.cidade());
-        endereco.setEstado(dto.estado());
-        endereco.setPrincipal(dto.isPrincipal());
-        return endereco;
-    }
-}

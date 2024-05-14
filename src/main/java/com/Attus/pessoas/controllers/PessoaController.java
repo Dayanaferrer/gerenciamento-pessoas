@@ -1,9 +1,7 @@
 package com.Attus.pessoas.controllers;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,12 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.Attus.pessoas.converters.PessoaConverter;
 import com.Attus.pessoas.dtos.PessoaRecordDto;
-import com.Attus.pessoas.exceptions.PessoaNotFoundException;
 import com.Attus.pessoas.models.PessoaModel;
 import com.Attus.pessoas.repositories.EnderecoRepository;
 import com.Attus.pessoas.repositories.PessoaRepository;
 import com.Attus.pessoas.services.PessoaService;
-import com.Attus.pessoas.models.EnderecoModel;
 
 @RestController
 @RequestMapping("/pessoas")
@@ -46,11 +42,13 @@ public class PessoaController {
         try {
             PessoaModel pessoaModel = pessoaConverter.dtoToEntity(pessoaRecordDto);
             PessoaModel createdPessoa = pessoaService.createPessoa(pessoaModel);
-            return new ResponseEntity<>(pessoaConverter.entityToDto(createdPessoa), HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(pessoaConverter.entityToDto(createdPessoa));
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            System.out.println("Erro ao criar pessoa: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            System.out.println("Erro ao criar pessoa: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -61,39 +59,41 @@ public class PessoaController {
             return ResponseEntity.ok(todasPessoas);
         } catch (Exception e) {
             System.out.println("Erro ao buscar todas as pessoas: " + e.getMessage());
-
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<PessoaRecordDto> getPessoaById(@PathVariable Long id) {
         try {
-            PessoaModel pessoa = pessoaService.getPessoaById(id);
-            if (pessoa == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            Optional<PessoaModel> optionalPessoa = pessoaService.getPessoaById(id);
+            if (!optionalPessoa.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
+            PessoaModel pessoa = optionalPessoa.get();
             PessoaRecordDto pessoaDto = pessoaConverter.entityToDto(pessoa);
-            return new ResponseEntity<>(pessoaDto, HttpStatus.OK);
+            return ResponseEntity.ok(pessoaDto);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            System.out.println("Erro ao buscar pessoa por id: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     @PutMapping("/{id}")
     public ResponseEntity<PessoaRecordDto> updatePessoa(@PathVariable Long id, @RequestBody PessoaRecordDto pessoaDto) {
         try {
-            PessoaModel existingPessoa = pessoaService.getPessoaById(id);
-            if (existingPessoa == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            Optional<PessoaModel> optionalPessoa = pessoaService.getPessoaById(id);
+            if (!optionalPessoa.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
             PessoaModel pessoaToUpdate = pessoaConverter.dtoToEntity(pessoaDto);
             pessoaToUpdate.setId(id);
             PessoaModel updatedPessoa = pessoaService.updatePessoa(pessoaToUpdate);
             PessoaRecordDto updatedPessoaDto = pessoaConverter.entityToDto(updatedPessoa);
-            return new ResponseEntity<>(updatedPessoaDto, HttpStatus.OK);
+            return ResponseEntity.ok(updatedPessoaDto);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            System.out.println("Erro ao atualizar pessoa: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

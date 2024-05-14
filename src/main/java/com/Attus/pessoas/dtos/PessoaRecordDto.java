@@ -8,9 +8,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public record PessoaRecordDto(
-        Long idPessoa,
+        Long id,
         @NotBlank String nomeCompleto,
         @NotNull LocalDate dataNascimento,
         @NotNull EnderecoRecordDto enderecoPrincipal,
-        @NotEmpty List<EnderecoRecordDto> enderecosSecundarios
+        List<EnderecoRecordDto> enderecosSecundarios
 ) {}
