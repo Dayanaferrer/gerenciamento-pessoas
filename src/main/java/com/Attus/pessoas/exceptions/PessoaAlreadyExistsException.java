@@ -2,22 +2,23 @@ package com.Attus.pessoas.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class PessoaAlreadyExistsException extends ApiBaseException {
+public class PessoaAlreadyExistsException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
     private String pessoa;
+    private HttpStatus status;
 
     public PessoaAlreadyExistsException(String message, String pessoa) {
-        super(HttpStatus.BAD_REQUEST, message);
+        super(message);
         this.pessoa = pessoa;
+        this.status = HttpStatus.BAD_REQUEST;
     }
 
     public String getPessoa() {
         return this.pessoa;
     }
 
-    @Override
     public HttpStatus getStatus() {
-        return super.getStatus();
+        return this.status;
     }
 }

@@ -2,22 +2,23 @@ package com.Attus.pessoas.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class PessoaInvalidDataException extends ApiBaseException {
+public class PessoaInvalidDataException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
     private String detalhes;
+    private HttpStatus status;
 
     public PessoaInvalidDataException(String message, String detalhes) {
-        super(HttpStatus.BAD_REQUEST, message);
+        super(message);
         this.detalhes = detalhes;
+        this.status = HttpStatus.BAD_REQUEST;
     }
 
     public String getDetalhes() {
         return this.detalhes;
     }
 
-    @Override
     public HttpStatus getStatus() {
-        return super.getStatus();
+        return this.status;
     }
 }

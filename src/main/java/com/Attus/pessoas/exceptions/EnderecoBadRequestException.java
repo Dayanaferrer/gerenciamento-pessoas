@@ -1,19 +1,24 @@
 package com.Attus.pessoas.exceptions;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class EnderecoBadRequestException extends ApiBaseException {
+public class EnderecoBadRequestException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
     private String detalhes;
+    private HttpStatus status;
 
     public EnderecoBadRequestException(String message, String detalhes) {
-        super(HttpStatus.BAD_REQUEST, message);
+        super(message);
         this.detalhes = detalhes;
+        this.status = HttpStatus.BAD_REQUEST;
     }
 
     public String getDetalhes() {
         return this.detalhes;
+    }
+
+    public HttpStatus getStatus() {
+        return this.status;
     }
 }

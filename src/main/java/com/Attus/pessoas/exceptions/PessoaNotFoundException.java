@@ -2,15 +2,18 @@ package com.Attus.pessoas.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class PessoaNotFoundException extends ApiBaseException {
+public class PessoaNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
     private String id;
     private String detalhes;
+    private HttpStatus status;
 
-    public PessoaNotFoundException(String message, String id) {
-        super(HttpStatus.NOT_FOUND, message);
+    public PessoaNotFoundException(String message, String id, String detalhes) {
+        super(message);
         this.id = id;
+        this.detalhes = detalhes;
+        this.status = HttpStatus.NOT_FOUND;
     }
 
     public String getId() {
@@ -21,8 +24,7 @@ public class PessoaNotFoundException extends ApiBaseException {
         return this.detalhes;
     }
 
-    @Override
     public HttpStatus getStatus() {
-        return super.getStatus();
+        return this.status;
     }
 }
