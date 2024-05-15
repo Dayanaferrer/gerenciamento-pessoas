@@ -16,27 +16,32 @@ public class EnderecoConverter {
             endereco.getNumero(),
             endereco.getCidade(),
             endereco.getEstado(),
-            endereco.getPrincipal()
+            endereco.getPrincipal() != null ? endereco.getPrincipal() : false
         );
     }
 
     public EnderecoModel dtoToEntity(EnderecoRecordDto dto) {
         EnderecoModel endereco = new EnderecoModel();
-        endereco.setId(dto.id());
-        endereco.setLogradouro(dto.logradouro());
-        endereco.setCep(dto.cep());
-        endereco.setNumero(dto.numero());
-        endereco.setCidade(dto.cidade());
-        endereco.setEstado(dto.estado());
-        endereco.setPrincipal(dto.isPrincipal());
+        updateEntityFromDto(dto, endereco);
         return endereco;
     }
+    
     public void updateEntityFromDto(EnderecoRecordDto dto, EnderecoModel entity) {
-        entity.setLogradouro(dto.logradouro());
-        entity.setCep(dto.cep());
-        entity.setNumero(dto.numero());
-        entity.setCidade(dto.cidade());
-        entity.setEstado(dto.estado());
-        entity.setPrincipal(dto.isPrincipal());
+        if(dto.logradouro() != null) {
+            entity.setLogradouro(dto.logradouro());
+        }
+        if(dto.cep() != null) {
+            entity.setCep(dto.cep());
+        }
+        if(dto.numero() != null) {
+            entity.setNumero(dto.numero());
+        }
+        if(dto.cidade() != null) {
+            entity.setCidade(dto.cidade());
+        }
+        if(dto.estado() != null) {
+            entity.setEstado(dto.estado());
+        }
+        entity.setPrincipal(dto.principal());
     }
 }

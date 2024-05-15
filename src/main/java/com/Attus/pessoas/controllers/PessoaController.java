@@ -59,7 +59,7 @@ public class PessoaController {
 
     @GetMapping("/nome/{nomeCompleto}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Consultar pessoas pelo nome completo")
+    @Operation(summary = "Consultar pessoas pelo nome")
     public List<PessoaRecordDto> getPessoasByNomeCompleto(@PathVariable String nomeCompleto) {
         return pessoaService.getPessoasByNomeCompleto(nomeCompleto);
     }

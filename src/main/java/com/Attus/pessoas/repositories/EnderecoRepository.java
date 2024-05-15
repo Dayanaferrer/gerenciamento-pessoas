@@ -12,6 +12,8 @@ import com.Attus.pessoas.models.PessoaModel;
 @Repository
 public interface EnderecoRepository extends JpaRepository<EnderecoModel, Long> {
 	 Optional<EnderecoModel> findByPessoaAndPrincipal(PessoaModel pessoa, boolean principal);
+	 List<EnderecoModel> findByPrincipal(boolean principal);
 	 List<EnderecoModel> findByPessoa(PessoaModel pessoa);
+	 Optional<EnderecoModel> findByIdAndPessoaId(Long id, Long pessoaId);
 
 }

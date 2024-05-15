@@ -76,7 +76,7 @@ public class PessoaConverter {
 	        endereco.setNumero(dto.numero());
 	        endereco.setCidade(dto.cidade());
 	        endereco.setEstado(dto.estado());
-	        endereco.setPrincipal(dto.isPrincipal());
+	        endereco.setPrincipal(dto.principal());
 	        return endereco;
 	    }
 	}

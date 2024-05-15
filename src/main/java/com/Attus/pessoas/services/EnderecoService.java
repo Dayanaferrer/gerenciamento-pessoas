@@ -18,6 +18,8 @@ import com.Attus.pessoas.models.PessoaModel;
 import com.Attus.pessoas.repositories.EnderecoRepository;
 import com.Attus.pessoas.repositories.PessoaRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class EnderecoService {
 	
@@ -30,59 +32,23 @@ public class EnderecoService {
 	 @Autowired
 	 private EnderecoConverter enderecoConverter;
 	 
-	 public List<EnderecoRecordDto> criarEnderecos(List<EnderecoRecordDto> enderecoDtos, Long pessoaId) {
-		    PessoaModel pessoa = pessoaRepository.findById(pessoaId)
-		            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
-
-		    long countPrincipal = enderecoDtos.stream().filter(EnderecoRecordDto::isPrincipal).count();
-		    if (countPrincipal > 1) {
-		        throw new PessoaInvalidDataException("Apenas um endereço pode ser marcado como principal", "Mais de um endereço foi marcado como principal");
-		    }
-
-		    if (countPrincipal == 1 && pessoa.getEnderecos().stream().anyMatch(EnderecoModel::getPrincipal)) {
-		        throw new PessoaInvalidDataException("A pessoa já tem um endereço principal", "Não é possível adicionar mais de um endereço principal para a mesma pessoa");
-		    }
-
-		    List<EnderecoModel> enderecos = new ArrayList<>();
-		    for (EnderecoRecordDto enderecoDto : enderecoDtos) {
-		        EnderecoModel endereco = enderecoConverter.dtoToEntity(enderecoDto);
-		        endereco.setPessoa(pessoa);
-		        enderecos.add(endereco);
-		    }
-
-		    enderecos = enderecoRepository.saveAll(enderecos);
-
-		    if (enderecos.isEmpty()) {
-		        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao salvar endereços");
-		    }
-
-		    return enderecos.stream().map(enderecoConverter::entityToDto).collect(Collectors.toList());
-		}
-	 
-	 
-	   public List<EnderecoRecordDto> editarEndereco(List<EnderecoRecordDto> enderecoDtos, Long pessoaId) {
-		    long countPrincipal = enderecoDtos.stream().filter(EnderecoRecordDto::isPrincipal).count();
-		    if (countPrincipal > 1) {
-		    	throw new PessoaInvalidDataException("Apenas um endereço pode ser marcado como principal", "Mais de um endereço foi marcado como principal");
-            }
-		    List<EnderecoModel> enderecos = new ArrayList<>();
-		    for (EnderecoRecordDto enderecoDto : enderecoDtos) {
-		        EnderecoModel endereco = enderecoRepository.findById(enderecoDto.id())
-		                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado"));
-		        enderecoConverter.updateEntityFromDto(enderecoDto, endereco);
-		        enderecos.add(endereco);
-		    }
-
-		    enderecos = enderecoRepository.saveAll(enderecos);
-
-		    return enderecos.stream().map(enderecoConverter::entityToDto).collect(Collectors.toList());
-		}
-
+	    public EnderecoRecordDto saveEndereco(EnderecoRecordDto enderecoDto) {
+	        EnderecoModel enderecoEntity = enderecoConverter.dtoToEntity(enderecoDto);
+	        enderecoEntity = enderecoRepository.save(enderecoEntity);
+	        return enderecoConverter.entityToDto(enderecoEntity);
+	    }
+	   
 	   public List<EnderecoRecordDto> consultarTodosEnderecos() {
 		    List<EnderecoModel> enderecos = enderecoRepository.findAll();
 		    return enderecos.stream()
 		            .map(enderecoConverter::entityToDto)
 		            .collect(Collectors.toList());
+		}
+	   
+	   public EnderecoRecordDto consultarEnderecoPorId(Long id) {
+		    EnderecoModel endereco = enderecoRepository.findById(id)
+		            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado"));
+		    return enderecoConverter.entityToDto(endereco);
 		}
 
 	   public EnderecoRecordDto consultarEnderecoPrincipal(Long pessoaId) {
@@ -94,4 +60,9 @@ public class EnderecoService {
 
 		    return enderecoConverter.entityToDto(enderecoPrincipal);
 		}
-	}
+	   
+
+}
+  
+	   
+	
