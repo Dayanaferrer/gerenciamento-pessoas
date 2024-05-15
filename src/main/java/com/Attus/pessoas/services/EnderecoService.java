@@ -1,6 +1,5 @@
 package com.Attus.pessoas.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,14 +10,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.Attus.pessoas.converters.EnderecoConverter;
 import com.Attus.pessoas.dtos.EnderecoRecordDto;
-import com.Attus.pessoas.exceptions.PessoaInvalidDataException;
 import com.Attus.pessoas.exceptions.PessoaNotFoundException;
 import com.Attus.pessoas.models.EnderecoModel;
 import com.Attus.pessoas.models.PessoaModel;
 import com.Attus.pessoas.repositories.EnderecoRepository;
 import com.Attus.pessoas.repositories.PessoaRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class EnderecoService {
