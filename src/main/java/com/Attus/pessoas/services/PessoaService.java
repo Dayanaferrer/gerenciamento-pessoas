@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.Attus.pessoas.converters.PessoaConverter;
 import com.Attus.pessoas.dtos.PessoaRecordDto;
+import com.Attus.pessoas.exceptions.PessoaInvalidDataException;
+import com.Attus.pessoas.exceptions.PessoaNotFoundException;
 import com.Attus.pessoas.models.EnderecoModel;
 import com.Attus.pessoas.models.PessoaModel;
 import com.Attus.pessoas.repositories.PessoaRepository;
@@ -53,7 +55,7 @@ public class PessoaService {
 
     public PessoaModel updatePessoa(PessoaModel pessoaModel) {
         if (!pessoaRepository.existsById(pessoaModel.getId())) {
-            throw new EntityNotFoundException("A pessoa com o ID especificado não existe.");
+        	throw new PessoaNotFoundException("Pessoa não encontrada", pessoaModel.getId().toString(), "A pessoa com o ID " + pessoaModel.getId() + " não existe.");
         }
         validateEnderecoPrincipal(pessoaModel);
         return pessoaRepository.save(pessoaModel);
@@ -62,7 +64,7 @@ public class PessoaService {
     private void validateEnderecoPrincipal(PessoaModel pessoaModel) {
         long count = pessoaModel.getEnderecos().stream().filter(EnderecoModel::getPrincipal).count();
         if (count > 1) {
-            throw new IllegalArgumentException("Uma pessoa não pode ter mais de um endereço principal.");
+        	throw new PessoaInvalidDataException("Uma pessoa não pode ter mais de um endereço principal.", "Mais de um endereço foi marcado como principal para a pessoa com o ID " + pessoaModel.getId());
         }
     }
 }

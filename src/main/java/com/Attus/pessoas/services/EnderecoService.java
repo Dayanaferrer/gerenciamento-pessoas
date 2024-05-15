@@ -11,6 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.Attus.pessoas.converters.EnderecoConverter;
 import com.Attus.pessoas.dtos.EnderecoRecordDto;
+import com.Attus.pessoas.exceptions.PessoaInvalidDataException;
+import com.Attus.pessoas.exceptions.PessoaNotFoundException;
 import com.Attus.pessoas.models.EnderecoModel;
 import com.Attus.pessoas.models.PessoaModel;
 import com.Attus.pessoas.repositories.EnderecoRepository;
@@ -31,8 +33,8 @@ public class EnderecoService {
 	   public List<EnderecoRecordDto> criarEnderecos(List<EnderecoRecordDto> enderecoDtos, Long pessoaId) {
 	        long countPrincipal = enderecoDtos.stream().filter(EnderecoRecordDto::isPrincipal).count();
 	        if (countPrincipal > 1) {
-	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Apenas um endereço pode ser marcado como principal");
-	        }
+	        	throw new PessoaInvalidDataException("Apenas um endereço pode ser marcado como principal", "Mais de um endereço foi marcado como principal");
+            }
 
 	        List<EnderecoModel> enderecos = new ArrayList<>();
 	        for (EnderecoRecordDto enderecoDto : enderecoDtos) {
@@ -51,9 +53,8 @@ public class EnderecoService {
 	   public List<EnderecoRecordDto> editarEndereco(List<EnderecoRecordDto> enderecoDtos, Long pessoaId) {
 		    long countPrincipal = enderecoDtos.stream().filter(EnderecoRecordDto::isPrincipal).count();
 		    if (countPrincipal > 1) {
-		        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Apenas um endereço pode ser marcado como principal");
-		    }
-
+		    	throw new PessoaInvalidDataException("Apenas um endereço pode ser marcado como principal", "Mais de um endereço foi marcado como principal");
+            }
 		    List<EnderecoModel> enderecos = new ArrayList<>();
 		    for (EnderecoRecordDto enderecoDto : enderecoDtos) {
 		        EnderecoModel endereco = enderecoRepository.findById(enderecoDto.id())
@@ -76,7 +77,7 @@ public class EnderecoService {
 
 	   public EnderecoRecordDto consultarEnderecoPrincipal(Long pessoaId) {
 		    PessoaModel pessoa = pessoaRepository.findById(pessoaId)
-		            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
+		    		.orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada", pessoaId.toString(), "A pessoa com o ID " + pessoaId + " não foi encontrada"));
 
 		    EnderecoModel enderecoPrincipal = enderecoRepository.findByPessoaAndPrincipal(pessoa, true)
 		            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço principal não encontrado"));
