@@ -1,5 +1,9 @@
 package com.Attus.pessoas.exceptions;
 
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,8 +33,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PessoaNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handlePessoaNotFound(PessoaNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> handlePessoaNotFound(PessoaNotFoundException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", ex.getStatus().value());
+        body.put("error", ex.getStatus().getReasonPhrase());
+        body.put("message", ex.getMessage());
+        body.put("id", ex.getId());
+        body.put("detalhes", ex.getDetalhes());
+
+        return new ResponseEntity<>(body, ex.getStatus());
     }
 
     @ExceptionHandler(EnderecoAlreadyExistsException.class)
@@ -53,7 +65,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EnderecoNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handleEnderecoNotFound(EnderecoNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> handleEnderecoNotFound(EnderecoNotFoundException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", ex.getStatus().value());
+        body.put("error", ex.getStatus().getReasonPhrase());
+        body.put("message", ex.getMessage());
+        body.put("id", ex.getId());
+        body.put("detalhes", ex.getDetalhes());
+
+        return new ResponseEntity<>(body, ex.getStatus());
     }
 }

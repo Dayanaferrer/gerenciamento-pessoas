@@ -5,17 +5,23 @@ import org.springframework.http.HttpStatus;
 public class EnderecoNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    private String endereco;
+    private String id;
+    private String detalhes;
     private HttpStatus status;
 
-    public EnderecoNotFoundException(String message, String endereco) {
+    public EnderecoNotFoundException(String message, String id, String detalhes) {
         super(message);
-        this.endereco = endereco;
+        this.id = id;
+        this.detalhes = detalhes;
         this.status = HttpStatus.NOT_FOUND;
     }
 
-    public String getEndereco() {
-        return this.endereco;
+    public String getId() {
+        return this.id;
+    }
+
+    public String getDetalhes() {
+        return this.detalhes;
     }
 
     public HttpStatus getStatus() {

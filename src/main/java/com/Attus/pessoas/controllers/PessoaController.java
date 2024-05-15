@@ -53,8 +53,7 @@ public class PessoaController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Consultar uma pessoa por ID")
     public PessoaRecordDto getPessoaById(@PathVariable Long id) {
-        PessoaModel pessoa = pessoaService.getPessoaById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
+        PessoaModel pessoa = pessoaService.getPessoaById(id);    
         return pessoaConverter.entityToDto(pessoa);
     }
 
@@ -77,7 +76,7 @@ public class PessoaController {
 
     @GetMapping("/ids")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Consulta uma ou mais pessoas pelos seus IDs")
+    @Operation(summary = "Consulta mais de uma pessoa pelos seus IDs")
     public List<PessoaRecordDto> getPessoasByIds(@RequestParam List<Long> ids) {
         return pessoaService.getPessoasByIds(ids);
     }

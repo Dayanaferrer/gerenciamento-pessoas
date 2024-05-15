@@ -28,6 +28,9 @@ public class PessoaService {
     
     public PessoaModel createPessoa(PessoaModel pessoaModel) {
         validateEnderecoPrincipal(pessoaModel);
+        if (pessoaModel.getEnderecos().stream().noneMatch(EnderecoModel::getPrincipal)) {
+            throw new PessoaInvalidDataException("Uma pessoa deve ter pelo menos um endereço principal.", "Nenhum endereço foi marcado como principal para a pessoa com o ID " + pessoaModel.getId());
+        }
         return pessoaRepository.save(pessoaModel);
     }
 
@@ -38,21 +41,40 @@ public class PessoaService {
     }
 
     public List<PessoaRecordDto> getPessoasByNomeCompleto(String nomeCompleto) {
-        return pessoaRepository.findByNomeCompletoContaining(nomeCompleto).stream()
+        List<PessoaRecordDto> pessoas = pessoaRepository.findByNomeCompletoContaining(nomeCompleto).stream()
             .map(pessoaConverter::entityToDto)
             .collect(Collectors.toList());
+
+        if (pessoas.isEmpty()) {
+            throw new PessoaNotFoundException("Nenhuma pessoa encontrada com o nome: " + nomeCompleto, nomeCompleto, "Nenhuma pessoa com o nome " + nomeCompleto + " foi encontrada.");
+        }
+
+        return pessoas;
     }
 
-    public Optional<PessoaModel> getPessoaById(Long id) {
-        return pessoaRepository.findById(id);
+    public PessoaModel getPessoaById(Long id) {
+        return pessoaRepository.findById(id).orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada", id.toString(), "A pessoa com o ID " + id + " não existe."));
     }
 
     public List<PessoaRecordDto> getPessoasByIds(List<Long> ids) {
-        return pessoaRepository.findByIdIn(ids).stream()
+        List<PessoaRecordDto> pessoas = pessoaRepository.findByIdIn(ids).stream()
             .map(pessoaConverter::entityToDto)
             .collect(Collectors.toList());
-    }
 
+        List<Long> foundIds = pessoas.stream()
+            .map(PessoaRecordDto::id)
+            .collect(Collectors.toList());
+
+        List<Long> notFoundIds = ids.stream()
+            .filter(id -> !foundIds.contains(id))
+            .collect(Collectors.toList());
+
+        if (!notFoundIds.isEmpty()) {
+            throw new PessoaNotFoundException("Pessoas com os seguintes IDs não foram encontradas: " + notFoundIds, "", "Pessoas com os IDs " + notFoundIds + " não foram encontradas.");
+        }
+
+        return pessoas;
+    }
     public PessoaModel updatePessoa(PessoaModel pessoaModel) {
         if (!pessoaRepository.existsById(pessoaModel.getId())) {
         	throw new PessoaNotFoundException("Pessoa não encontrada", pessoaModel.getId().toString(), "A pessoa com o ID " + pessoaModel.getId() + " não existe.");

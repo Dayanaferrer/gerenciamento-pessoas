@@ -30,25 +30,35 @@ public class EnderecoService {
 	 @Autowired
 	 private EnderecoConverter enderecoConverter;
 	 
-	   public List<EnderecoRecordDto> criarEnderecos(List<EnderecoRecordDto> enderecoDtos, Long pessoaId) {
-	        long countPrincipal = enderecoDtos.stream().filter(EnderecoRecordDto::isPrincipal).count();
-	        if (countPrincipal > 1) {
-	        	throw new PessoaInvalidDataException("Apenas um endereço pode ser marcado como principal", "Mais de um endereço foi marcado como principal");
-            }
+	 public List<EnderecoRecordDto> criarEnderecos(List<EnderecoRecordDto> enderecoDtos, Long pessoaId) {
+		    PessoaModel pessoa = pessoaRepository.findById(pessoaId)
+		            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
 
-	        List<EnderecoModel> enderecos = new ArrayList<>();
-	        for (EnderecoRecordDto enderecoDto : enderecoDtos) {
-	            EnderecoModel endereco = enderecoConverter.dtoToEntity(enderecoDto);
-	            endereco.setPessoa(pessoaRepository.findById(pessoaId)
-	                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada")));
-	            enderecos.add(endereco);
-	        }
+		    long countPrincipal = enderecoDtos.stream().filter(EnderecoRecordDto::isPrincipal).count();
+		    if (countPrincipal > 1) {
+		        throw new PessoaInvalidDataException("Apenas um endereço pode ser marcado como principal", "Mais de um endereço foi marcado como principal");
+		    }
 
-	        enderecos = enderecoRepository.saveAll(enderecos);
+		    if (countPrincipal == 1 && pessoa.getEnderecos().stream().anyMatch(EnderecoModel::getPrincipal)) {
+		        throw new PessoaInvalidDataException("A pessoa já tem um endereço principal", "Não é possível adicionar mais de um endereço principal para a mesma pessoa");
+		    }
 
-	        return enderecos.stream().map(enderecoConverter::entityToDto).collect(Collectors.toList());
-	    }
-	
+		    List<EnderecoModel> enderecos = new ArrayList<>();
+		    for (EnderecoRecordDto enderecoDto : enderecoDtos) {
+		        EnderecoModel endereco = enderecoConverter.dtoToEntity(enderecoDto);
+		        endereco.setPessoa(pessoa);
+		        enderecos.add(endereco);
+		    }
+
+		    enderecos = enderecoRepository.saveAll(enderecos);
+
+		    if (enderecos.isEmpty()) {
+		        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao salvar endereços");
+		    }
+
+		    return enderecos.stream().map(enderecoConverter::entityToDto).collect(Collectors.toList());
+		}
+	 
 	 
 	   public List<EnderecoRecordDto> editarEndereco(List<EnderecoRecordDto> enderecoDtos, Long pessoaId) {
 		    long countPrincipal = enderecoDtos.stream().filter(EnderecoRecordDto::isPrincipal).count();

@@ -1,5 +1,6 @@
 package com.Attus.pessoas.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class EnderecoController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Criar novos endereços vinculados a id de pessoa")
-    public List<EnderecoRecordDto> criarEnderecos(@PathVariable Long pessoaId, @RequestBody List<EnderecoRecordDto> enderecoDtos) {
+    public List<EnderecoRecordDto> criarEnderecos(@PathVariable Long pessoaId, @RequestBody ArrayList<EnderecoRecordDto> enderecoDtos) {
         return enderecoService.criarEnderecos(enderecoDtos, pessoaId);
     }
 
