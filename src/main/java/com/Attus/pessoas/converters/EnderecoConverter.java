@@ -31,4 +31,12 @@ public class EnderecoConverter {
         endereco.setPrincipal(dto.isPrincipal());
         return endereco;
     }
+    public void updateEntityFromDto(EnderecoRecordDto dto, EnderecoModel entity) {
+        entity.setLogradouro(dto.logradouro());
+        entity.setCep(dto.cep());
+        entity.setNumero(dto.numero());
+        entity.setCidade(dto.cidade());
+        entity.setEstado(dto.estado());
+        entity.setPrincipal(dto.isPrincipal());
+    }
 }

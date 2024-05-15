@@ -13,6 +13,8 @@ import com.Attus.pessoas.models.EnderecoModel;
 import com.Attus.pessoas.models.PessoaModel;
 import com.Attus.pessoas.repositories.PessoaRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class PessoaService {
 
@@ -23,29 +25,26 @@ public class PessoaService {
     private PessoaConverter pessoaConverter;
     
     public PessoaModel createPessoa(PessoaModel pessoaModel) {
-        long count = pessoaModel.getEnderecos().stream().filter(EnderecoModel::getPrincipal).count();
-        if (count > 1) {
-            throw new IllegalArgumentException("Uma pessoa não pode ter mais de um endereço principal.");
-        }
+        validateEnderecoPrincipal(pessoaModel);
         return pessoaRepository.save(pessoaModel);
     }
-    
+
     public List<PessoaRecordDto> buscarTodas() {
         return pessoaRepository.findAll().stream()
             .map(pessoaConverter::entityToDto)
             .collect(Collectors.toList());
     }
-    
+
     public List<PessoaRecordDto> getPessoasByNomeCompleto(String nomeCompleto) {
         return pessoaRepository.findByNomeCompletoContaining(nomeCompleto).stream()
             .map(pessoaConverter::entityToDto)
             .collect(Collectors.toList());
     }
-    
+
     public Optional<PessoaModel> getPessoaById(Long id) {
         return pessoaRepository.findById(id);
     }
-    
+
     public List<PessoaRecordDto> getPessoasByIds(List<Long> ids) {
         return pessoaRepository.findByIdIn(ids).stream()
             .map(pessoaConverter::entityToDto)
@@ -54,10 +53,16 @@ public class PessoaService {
 
     public PessoaModel updatePessoa(PessoaModel pessoaModel) {
         if (!pessoaRepository.existsById(pessoaModel.getId())) {
-            throw new IllegalArgumentException("A pessoa com o ID especificado não existe.");
+            throw new EntityNotFoundException("A pessoa com o ID especificado não existe.");
         }
+        validateEnderecoPrincipal(pessoaModel);
         return pessoaRepository.save(pessoaModel);
     }
 
-
+    private void validateEnderecoPrincipal(PessoaModel pessoaModel) {
+        long count = pessoaModel.getEnderecos().stream().filter(EnderecoModel::getPrincipal).count();
+        if (count > 1) {
+            throw new IllegalArgumentException("Uma pessoa não pode ter mais de um endereço principal.");
+        }
+    }
 }
