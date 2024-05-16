@@ -1,6 +1,7 @@
 package com.Attus.pessoas.services;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,8 +58,20 @@ public class PessoaService {
     }
 
     public List<PessoaRecordDto> getPessoasByIds(List<Long> ids) {
-        List<PessoaRecordDto> pessoas = pessoaRepository.findByIdIn(ids).stream()
-            .map(pessoaConverter::entityToDto)
+        List<PessoaModel> pessoasModel = pessoaRepository.findByIdIn(ids);
+        if (pessoasModel == null) {
+            throw new PessoaNotFoundException("Pessoas com os seguintes IDs não foram encontradas: " + ids, "", "Pessoas com os IDs " + ids + " não foram encontradas.");
+        }
+
+        List<PessoaRecordDto> pessoas = pessoasModel.stream()
+            .filter(Objects::nonNull)
+            .map(pessoa -> {
+                PessoaRecordDto dto = pessoaConverter.entityToDto(pessoa);
+                if (dto == null) {
+                    throw new RuntimeException("A conversão de PessoaModel para PessoaRecordDto retornou null");
+                }
+                return dto;
+            })
             .collect(Collectors.toList());
 
         List<Long> foundIds = pessoas.stream()
@@ -75,6 +88,7 @@ public class PessoaService {
 
         return pessoas;
     }
+    
     public PessoaModel updatePessoa(PessoaModel pessoaModel) {
         if (!pessoaRepository.existsById(pessoaModel.getId())) {
         	throw new PessoaNotFoundException("Pessoa não encontrada", pessoaModel.getId().toString(), "A pessoa com o ID " + pessoaModel.getId() + " não existe.");
