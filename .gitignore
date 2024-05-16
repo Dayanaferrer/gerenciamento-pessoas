@@ -29,5 +29,14 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Arquivos temporários
+.tmp/
+.temp/
+
+# Logs e arquivos gerados
+logs/
+*.log
+
 ### VS Code ###
 .vscode/
+.metadata/
