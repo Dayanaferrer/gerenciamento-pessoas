@@ -38,7 +38,7 @@ import com.Attus.pessoas.services.PessoaService;
 
 public class PessoaServiceTest {
 
-	  	@InjectMocks
+	    @InjectMocks
 	    private PessoaService pessoaService;
 
 	    @Mock
